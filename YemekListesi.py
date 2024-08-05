@@ -14,11 +14,12 @@ def resource_path(relative_path):
         base_path = sys._MEIPASS
     except Exception:
         base_path = os.path.abspath(".")
-
     return os.path.join(base_path, relative_path)
 
 def create_database():
     db_path = resource_path('workers.db')
+    if os.path.exists(db_path):
+        os.remove(db_path)  # Eski veritabanı dosyasını sil
     conn = sqlite3.connect(db_path)
     c = conn.cursor()
     c.execute('''CREATE TABLE IF NOT EXISTS workers (
@@ -141,7 +142,7 @@ class WorkerApp:
                 c.execute("INSERT INTO workers (name, type) VALUES (?, ?)", (name, worker_type))
                 conn.commit()
                 conn.close()
-                messagebox.showinfo("Başarılı", "İşçi/Memur Başarıyla Eklendi.")
+                messagebox.showinfo("Başarılı", f"{worker_type} başarıyla eklendi.")
                 self.name_entry.delete(0, tk.END)
                 self.list_workers(worker_type)
             except sqlite3.Error as e:
@@ -153,7 +154,8 @@ class WorkerApp:
 
     def delete_worker(self):
         try:
-            worker_id = int(self.worker_listbox.get(tk.ACTIVE).split(':')[0])
+            selected_worker = self.worker_listbox.get(tk.ACTIVE)
+            worker_id = int(selected_worker.split(':')[0])
             conn = sqlite3.connect(resource_path('workers.db'))
             c = conn.cursor()
             c.execute("DELETE FROM workers WHERE id = ?", (worker_id,))
