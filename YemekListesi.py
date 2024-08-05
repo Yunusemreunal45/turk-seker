@@ -42,7 +42,7 @@ class WorkerApp:
     def __init__(self, root):
         self.root = root
         self.root.title("YemekListesi")
-        self.root.geometry("600x600")
+        self.root.geometry("800x600")
 
         # Renk paleti
         self.bg_color = "#2C3E50"       # Ana arka plan rengi
@@ -61,7 +61,7 @@ class WorkerApp:
         frame_top.pack(fill=tk.X)
 
         # İşçi ekleme arayüzü
-        self.name_label = tk.Label(frame_top, text="İşçi İsmi:", font=self.font, bg=self.bg_color, fg=self.fg_color)
+        self.name_label = tk.Label(frame_top, text="İşçi/Memur İsmi:", font=self.font, bg=self.bg_color, fg=self.fg_color)
         self.name_label.pack(side=tk.LEFT, padx=(20, 10))
 
         self.name_entry = tk.Entry(frame_top, font=self.font, bg=self.entry_bg, fg=self.fg_color, insertbackground=self.fg_color)
@@ -75,18 +75,21 @@ class WorkerApp:
         self.type_optionmenu.config(font=self.font, bg=self.entry_bg, fg=self.fg_color)
         self.type_optionmenu.pack(side=tk.LEFT, padx=(0, 10))
 
-        self.add_button = tk.Button(frame_top, text="İşçi Ekleme", command=self.add_worker, font=self.font, bg=self.button_bg, fg=self.bg_color)
+        self.add_button = tk.Button(frame_top, text="Ekle", command=self.add_worker, font=self.font, bg=self.button_bg, fg=self.bg_color)
         self.add_button.pack(side=tk.LEFT, padx=(0, 20))
 
-        self.delete_button = tk.Button(frame_top, text="İşçi Sil", command=self.delete_worker, font=self.font, bg=self.button_bg, fg=self.bg_color)
+        self.delete_button = tk.Button(frame_top, text="Sil", command=self.delete_worker, font=self.font, bg=self.button_bg, fg=self.bg_color)
         self.delete_button.pack(side=tk.LEFT, padx=(0, 20))
 
         # Orta çerçeve
         frame_middle = tk.Frame(self.root, pady=10, bg=self.bg_color)
         frame_middle.pack(fill=tk.X)
 
-        self.list_workers_button = tk.Button(frame_middle, text="İşçi Listele", command=self.list_workers, font=self.font, bg=self.button_bg, fg=self.bg_color)
+        self.list_workers_button = tk.Button(frame_middle, text="İşçileri Listele", command=lambda: self.list_workers("İşçi"), font=self.font, bg=self.button_bg, fg=self.bg_color)
         self.list_workers_button.pack(side=tk.LEFT, padx=(20, 10))
+
+        self.list_officers_button = tk.Button(frame_middle, text="Memurları Listele", command=lambda: self.list_workers("Memur"), font=self.font, bg=self.button_bg, fg=self.bg_color)
+        self.list_officers_button.pack(side=tk.LEFT, padx=(20, 10))
 
         self.worker_listbox = tk.Listbox(frame_middle, font=self.font, bg=self.listbox_bg, fg=self.fg_color, selectbackground=self.highlight_bg, height=10)
         self.worker_listbox.pack(side=tk.LEFT, padx=(0, 10), fill=tk.X, expand=True)
@@ -138,15 +141,15 @@ class WorkerApp:
                 c.execute("INSERT INTO workers (name, type) VALUES (?, ?)", (name, worker_type))
                 conn.commit()
                 conn.close()
-                messagebox.showinfo("Başarılı", "İşçi Başarıyla Eklendi.")
+                messagebox.showinfo("Başarılı", "İşçi/Memur Başarıyla Eklendi.")
                 self.name_entry.delete(0, tk.END)
-                self.list_workers()
+                self.list_workers(worker_type)
             except sqlite3.Error as e:
                 messagebox.showerror("Hata", f"Veritabanı hatası: {e}")
             except Exception as e:
                 messagebox.showerror("Hata", f"Beklenmeyen hata: {e}")
         else:
-            messagebox.showerror("Hata", "İşçi İsmi ve tipi bulunamadı.")
+            messagebox.showerror("Hata", "İşçi/Memur İsmi ve tipi bulunamadı.")
 
     def delete_worker(self):
         try:
@@ -157,25 +160,25 @@ class WorkerApp:
             c.execute("DELETE FROM meals WHERE worker_id = ?", (worker_id,))
             conn.commit()
             conn.close()
-            messagebox.showinfo("Başarılı", "İşçi ve ilgili yemek bilgileri başarıyla silindi.")
-            self.list_workers()
+            messagebox.showinfo("Başarılı", "İşçi/Memur ve ilgili yemek bilgileri başarıyla silindi.")
+            self.worker_listbox.delete(tk.ACTIVE)
             self.meal_listbox.delete(0, tk.END)
             self.total_meal_label.config(text="")
         except Exception as e:
             messagebox.showerror("Hata", f"Bir hata oluştu: {e}")
 
-    def list_workers(self):
+    def list_workers(self, worker_type):
         self.worker_listbox.delete(0, tk.END)
         try:
             conn = sqlite3.connect(resource_path('workers.db'))
             c = conn.cursor()
-            c.execute("SELECT * FROM workers")
+            c.execute("SELECT * FROM workers WHERE type = ?", (worker_type,))
             workers = c.fetchall()
             for worker in workers:
                 self.worker_listbox.insert(tk.END, f"{worker[0]}: {worker[1]} ({worker[2]})")
             conn.close()
         except Exception as e:
-            messagebox.showerror("Hata", f"İşçileri listelerken bir hata oluştu: {e}")
+            messagebox.showerror("Hata", f"İşçileri/Memurları listelerken bir hata oluştu: {e}")
 
     def add_meal(self):
         try:
