@@ -4,19 +4,6 @@ Bu Python uygulaması, bir iş yerindeki çalışanların yemek harcamalarını 
 
 ### Kütüphaneler
 
-```python
-import tkinter as tk
-from tkinter import ttk, messagebox, colorchooser, simpledialog
-# ... diğer importlar
-bu markdown dosyasının içeriğini arttır mısın
-
-
-Taslakları göster
-
-
-Harika bir başlangıç! Python ile yemek listesi uygulaması geliştirmek oldukça kullanışlı bir proje. Kütüphanelerin kullanım amaçlarını daha detaylı açıklayalım ve markdown dosyanızı zenginleştirelim:
-Python ile Yemek Listesi Uygulaması
-Bu Python uygulaması, bir iş yerindeki çalışanların yemek harcamalarını takip etmek için tasarlanmıştır. Tkinter kütüphanesi kullanarak kullanıcı arayüzü oluşturulmuş ve SQLite veritabanı ile veri saklama işlemleri gerçekleştirilmiştir.
 
 Kütüphanelerin Rolü
 tkinter: Python'ın standart grafik kullanıcı arayüzü (GUI) kütüphanesidir. Bu uygulamada pencereler, düğmeler, giriş kutuları gibi tüm görsel öğeleri oluşturmak için kullanılır.
